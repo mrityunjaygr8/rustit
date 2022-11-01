@@ -1,6 +1,6 @@
-use serde::Serialize;
-use actix_web::{HttpResponse, ResponseError, http::StatusCode};
+use actix_web::{http::StatusCode, HttpResponse, ResponseError};
 use derive_more::{Display, Error};
+use serde::Serialize;
 
 #[derive(Serialize)]
 struct FormattedErrorResponse {
@@ -19,7 +19,7 @@ pub enum CustomError {
     InternalError,
     // Formatting the bad request error message
     #[display(fmt = "Bad request: {}", field)]
-    BadClientData {field: String},
+    BadClientData { field: String },
     #[display(fmt = "Not found!")]
     NotFound,
 }
@@ -29,10 +29,9 @@ impl CustomError {
         match self {
             CustomError::ValidationError { .. } => "Validation Error".to_string(),
             CustomError::InternalError => "Internal Server Error".to_string(),
-            CustomError::BadClientData {..} => "Bad request".to_string(),
+            CustomError::BadClientData { .. } => "Bad request".to_string(),
             CustomError::NotFound => "Not found".to_string(),
         }
-
     }
 }
 
@@ -52,7 +51,7 @@ impl ResponseError for CustomError {
         match *self {
             CustomError::InternalError => StatusCode::INTERNAL_SERVER_ERROR,
             CustomError::ValidationError { .. } => StatusCode::BAD_REQUEST,
-            CustomError::BadClientData {..} => StatusCode::BAD_REQUEST,
+            CustomError::BadClientData { .. } => StatusCode::BAD_REQUEST,
             CustomError::NotFound => StatusCode::NOT_FOUND,
         }
     }
